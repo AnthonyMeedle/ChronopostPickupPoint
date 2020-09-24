@@ -75,6 +75,7 @@ class ChronopostPickupPointBackOfficeController extends BaseAdminController
             /** Basic informations */
             ChronopostPickupPoint::setConfigValue(ChronopostPickupPointConst::CHRONOPOST_PICKUP_POINT_CODE_CLIENT, $data[ChronopostPickupPointConst::CHRONOPOST_PICKUP_POINT_CODE_CLIENT]);
             ChronopostPickupPoint::setConfigValue(ChronopostPickupPointConst::CHRONOPOST_PICKUP_POINT_PASSWORD, $data[ChronopostPickupPointConst::CHRONOPOST_PICKUP_POINT_PASSWORD]);
+            ChronopostPickupPoint::setConfigValue(ChronopostPickupPointConst::CHRONOPOST_GOOGLE_MAP_API_KEY, $data[ChronopostPickupPointConst::CHRONOPOST_GOOGLE_MAP_API_KEY]);
 
             /** Delivery types */
             foreach (ChronopostPickupPointConst::getDeliveryTypesStatusKeys() as $statusKey) {

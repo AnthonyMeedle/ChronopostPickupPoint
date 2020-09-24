@@ -13,4 +13,10 @@ class FrontHook extends BaseHook
         $content = $this->render("ChronopostPickupPoint.html", $event->getArguments());
         $event->add($content);
     }
+    
+    public function onOrderInvoiceDeliveryAddress(HookRenderEvent $event)
+    {
+        $content = $this->render('delivery-address.html', $event->getArguments());
+        $event->add($content);
+    }
 }

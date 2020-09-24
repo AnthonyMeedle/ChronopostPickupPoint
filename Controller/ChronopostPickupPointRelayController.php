@@ -48,4 +48,24 @@ class ChronopostPickupPointRelayController extends BaseAdminController
 
         return $response->return->listePointRelais;
     }
+    public function findByCodeId($codeId)
+    {
+        $config = ChronopostPickupPointConst::getConfig();
+        $datetime = new \DateTime('tomorrow');
+        $tomorrow = $datetime->format('d/m/Y');
+        /** START */
+        /** SHIPPER INFORMATIONS */
+        $APIData = [
+            "id" => $codeId
+        ];
+
+        /** Send informations to the Chronopost API */
+        $soapClient = new \SoapClient(ChronopostPickupPointConst::CHRONOPOST_PICKUP_POINT_RELAY_SEARCH_SERVICE_WSDL, array("trace" => 1, "exception" => 1));
+        $response = $soapClient->__soapCall('recherchePointChronopostParId', [$APIData]);
+
+        if (0 != $response->errorCode) {
+            throw new \Exception($response->errorMessage);
+        }
+        return $response->return;
+    }
 }

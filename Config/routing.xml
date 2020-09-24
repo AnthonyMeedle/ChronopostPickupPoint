@@ -41,4 +41,9 @@
         <default key="_controller">ChronopostPickupPoint\Controller\ChronopostPickupPointRelayController::findByAddress</default>
     </route>
 
+    <route id="chronopost.pickup.search.point" path="/module/chronopost-pickup-point/{countryid}/{zipcode}/{city}/{address}">
+        <default key="_controller">ChronopostPickupPoint\Controller\ChronopostPickupPointGetSpecificLocation::get</default>
+        <default key="address"></default>
+        <requirement key="city">[a-zA-Z\- ]+</requirement>
+    </route>
 </routes>

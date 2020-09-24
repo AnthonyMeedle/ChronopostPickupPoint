@@ -9,6 +9,8 @@
         <loop class="ChronopostPickupPoint\Loop\ChronopostPickupPointDeliveryMode" name="chronopost.pickup.point.delivery.mode" />
         <loop class="ChronopostPickupPoint\Loop\ChronopostPickupPointAreaFreeshipping" name="chronopost.pickup.point.area.freeshipping" />
         <loop class="ChronopostPickupPoint\Loop\ChronopostPickupPointGetRelay" name="chronopost.pickup.point.get.relay" />
+        <loop class="ChronopostPickupPoint\Loop\ChronopostPickupPointId" name="chronopost.pickup.point.id" />
+        <loop class="ChronopostPickupPoint\Loop\ChronopostPickupPointAddress" name="address.chronopost.pickup.point" />
     </loops>
 
     <forms>
@@ -46,6 +48,7 @@
         </hook>
         <hook id="chronopost.pickup.point.hook.front" class="ChronopostPickupPoint\Hook\FrontHook" scope="request">
             <tag name="hook.event_listener" event="order-delivery.extra" />
+            <tag name="hook.event_listener" event="order-invoice.delivery-address" />
         </hook>
     </hooks>
 

@@ -18,6 +18,7 @@ class ChronopostPickupPointConst
     /** Chronopost shipper identifiers */
     const CHRONOPOST_PICKUP_POINT_CODE_CLIENT                    = "chronopost_pickup_point_code";
     const CHRONOPOST_PICKUP_POINT_PASSWORD                       = "chronopost_pickup_point_password";
+    const CHRONOPOST_GOOGLE_MAP_API_KEY                          = "chronopost_google_map_api_key";
 
 
     /** WSDL for the Chronopost Shipping Service */
@@ -52,6 +53,7 @@ class ChronopostPickupPointConst
             /** Chronopost basic informations */
             self::CHRONOPOST_PICKUP_POINT_CODE_CLIENT                => ChronopostPickupPoint::getConfigValue(self::CHRONOPOST_PICKUP_POINT_CODE_CLIENT),
             self::CHRONOPOST_PICKUP_POINT_PASSWORD                   => ChronopostPickupPoint::getConfigValue(self::CHRONOPOST_PICKUP_POINT_PASSWORD),
+            self::CHRONOPOST_GOOGLE_MAP_API_KEY                   => ChronopostPickupPoint::getConfigValue(self::CHRONOPOST_GOOGLE_MAP_API_KEY),
 
             /** END */
         ];

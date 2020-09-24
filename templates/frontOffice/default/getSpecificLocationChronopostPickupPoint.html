@@ -1,0 +1,32 @@
+{literal}
+{
+{/literal}
+"locations":{$latf=0}{$lngf=0}
+[
+{loop type="chronopost.pickup.point.get.relay" name="delivery-selection-chronopost-pickup-point" orderweight="1000" countryid=$_countryid_ zipcode=$_zipcode_ city=$_city_ address=$_address_}
+    {literal}
+    {
+    {/literal}
+        "name": "{$NOM}",
+        "lat": {$COORDGEOLOCALISATIONLATITUDE},{if $latf==0}{$latf=$COORDGEOLOCALISATIONLATITUDE}{/if}
+        "lng": {$COORDGEOLOCALISATIONLONGITUDE},{if $lngf==0}{$lngf=$COORDGEOLOCALISATIONLONGITUDE}{/if}
+        "id": "{$IDENTIFIANT}",
+        "address": "{$ADRESSE1}",
+        "zipcode": "{$CODEPOSTAL}",
+        "city": "{$LOCALITE}",
+        "countrycode" : "{$CODEPAYS}",
+        "distance": "{if $DISTANCEENMETRE > 1000}{format_number number={$DISTANCEENMETRE/1000}} Kilomètres {else}{$DISTANCEENMETRE} mètres{/if}",
+        "type": "{$TYPEDEPOINT}",
+        "horaires": "{foreach from=$LISTEHORAIREOUVERTURE item=horaire}{$infoHoraire[$horaire->jour]['jour'] = {intl l="jour{$horaire->jour}" d='chronopostpickuppoint'}}{$infoHoraire[$horaire->jour]['horaire'] = {$horaire->horairesAsString}}{/foreach}{$tmp={$infoHoraire|ksort}}{foreach from=$infoHoraire item=horaire}{intl l={$horaire.jour} d='chronopostpickuppoint'} - {$horaire.horaire}<br>{/foreach}",
+        "disabledPerson": "{$ACCESPERSONNEMOBILITEREDUITE}"
+    {literal}
+    }
+    {/literal}
+    {if $LOOP_COUNT < $LOOP_TOTAL},{/if}
+{/loop}
+],
+"lat":"{$latf}",
+"lng":"{$lngf}"
+{literal}
+}
+{/literal}

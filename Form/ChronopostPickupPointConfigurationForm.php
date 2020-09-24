@@ -45,6 +45,20 @@ class ChronopostPickupPointConfigurationForm extends BaseForm
                     ],
                 ]
             )
+            ->add(ChronopostPickupPointConst::CHRONOPOST_GOOGLE_MAP_API_KEY,
+                "text",
+                [
+                    'required'      => false,
+                    'data'          => $config[ChronopostPickupPointConst::CHRONOPOST_GOOGLE_MAP_API_KEY],
+                    'label'         => Translator::getInstance()->trans("Chronopost google map API key"),
+                    'label_attr'    => [
+                        'for'           => 'title',
+                    ],
+                    'attr'          => [
+                        'placeholder'   => Translator::getInstance()->trans("Your API key google map"),
+                    ],
+                ]
+            )
         ;
 
         /** Delivery types */

@@ -3,8 +3,31 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="../../../vendor/propel/propel/resources/xsd/database.xsd" >
 
+    <table name="address_chronopost_pickup_point">
+        <column name="id" primaryKey="true" required="true" type="INTEGER" />
+        <column name="title_id" required="true" type="INTEGER" />
+        <column name="company" size="255" type="VARCHAR" />
+        <column name="firstname" required="true" size="255" type="VARCHAR" />
+        <column name="lastname" required="true" size="255" type="VARCHAR" />
+        <column name="address1" required="true" size="255" type="VARCHAR" />
+        <column name="address2" required="true" size="255" type="VARCHAR" />
+        <column name="address3" required="true" size="255" type="VARCHAR" />
+        <column name="zipcode" required="true" size="10" type="VARCHAR" />
+        <column name="city" required="true" size="255" type="VARCHAR" />
+        <column name="country_id" required="true" type="INTEGER" />
+        <column name="code" required="true" size="10" type="VARCHAR" />
+        <column name="type" required="true" size="10" type="VARCHAR" />
+        <column name="cellphone" required="false" size="20" type="VARCHAR" />
+        <foreign-key foreignTable="customer_title" name="fk_address_chronopost_pickup_point_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+            <reference foreign="id" local="title_id" />
+        </foreign-key>
+        <foreign-key foreignTable="country" name="fk_address_chronopost_pickup_point_country_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+            <reference foreign="id" local="country_id" />
+        </foreign-key>
+    </table>
+
     <table name="chronopost_pickup_point_order">
-        <column name="id" autoIncrement="true" primaryKey="true" required="true" type="INTEGER" />
+        <column name="id" primaryKey="true" autoIncrement="true" required="true" type="INTEGER" />
         <column name="order_id" required="true" type="INTEGER" />
 
         <column name="delivery_type" type="LONGVARCHAR" />

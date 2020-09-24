@@ -1,7 +1,5 @@
-{loop type="chronopost.pickup.point.get.relay" name="chronopost-relay" orderweight="1000" countryid="64" zipcode="69003" city="Lyon" address="7 rue de la rize"}
-{/loop}
-
-
+{$firstcoorLa=''}
+{$firstcoorLo=''}
 {loop type="delivery" name="chronopost-pickup-point" id=$module force_return="true"}
     <tr style="display: none;" id="deliverytype-chronopost-pickup-point-tr">
         <td colspan="3">
@@ -22,10 +20,101 @@
 
                                 <div style="padding-top: 15px;">
                                     {intl l="Delivery in a relay of your choice, before tomorrow 13H." d='chronopost.pickup.point.fo.default'}
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                             <div id="map" style="height: 500px; width: 100%; border: 1px solid #000; background: #EFEFEF; border-radius: 10px;"></div>
+                                            <div class="container-fluid">
+                                                <div class="col-md-12">
+                                                    <h4>{intl l="Search Chronopost relay in a city" d='chronopost.pickup.point.fo.default'}</h4>
 
+                                                    <div class="row">
+                                                        <div class="col-md-3">
+                                                            <label for="search-address-chronopost-pickup-point" class="control-label sr-only">
+                                                                {intl l="address" d='chronopost.pickup.point.fo.default'}
+                                                            </label>
+                                                            <input type="text" id="search-address-chronopost-pickup-point" placeholder="{intl l='address' d='chronopost.pickup.point.fo.default'}" class="form-control" style="" onPaste=""
+                                                                   {literal}onkeydown="if (event.keyCode == 13) {return false;}"{/literal} value=""/>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <label for="search-zipcode-chronopost-pickup-point" class="control-label sr-only">
+                                                                {intl l="zipcode" d='chronopost.pickup.point.fo.default'}
+                                                            </label>
+                                                            <input type="text" id="search-zipcode-chronopost-pickup-point" placeholder="{intl l='zipcode' d='chronopost.pickup.point.fo.default'}" class="form-control" style="" onPaste=""
+                                                                   {literal}onkeydown="if (event.keyCode == 13) {search_city_chronopost_pickup_point();return false;}"{/literal} value=""/>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <label for="search-city-chronopost-pickup-point" class="control-label sr-only">
+                                                                {intl l="city" d='chronopost.pickup.point.fo.default'}
+                                                            </label>
+                                                            <input type="text" id="search-city-chronopost-pickup-point" placeholder="{intl l='city' d='chronopost.pickup.point.fo.default'}" class="form-control" style="" onPaste=""
+                                                                   {literal}onkeydown="if (event.keyCode == 13) {search_city_chronopost_pickup_point();return false;}"{/literal} value=""/>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <select id="search-countryid-chronopost-pickup-point" class="form-control">
+                                                            {loop type="country" name="country.list"}
+                                                            <option value="{$ID}"
+                                                                {if $value != ""}
+                                                                    {if $value == $ID}selected{/if}
+                                                                {else}
+                                                                    {if $IS_DEFAULT}selected{/if}
+                                                                {/if}
+                                                            >{$TITLE}</option>
+                                                            {/loop}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-2">
+                                                            <button type="button" id="search-city-submit-chronopost-pickup-point" class="form-submit-button btn btn-block btn-default" title="{intl l='Search' d='chronopost.pickup.fo.default'}" onclick="search_city_chronopost_pickup_point();">
+                                                                <span class="glyphicon glyphicon-search"></span>
+                                                                {intl l='Search' d='chronopost.pickup.point.fo.default'}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4" id="chronopostpickuppointmap" style="height: 600px; overflow-y: auto;">
+                                    {for $j=1 to 7}
+                                    {$horaireFerme[$j]['jour']={intl l="jour{$j}" d='chronopostpickuppoint'}}
+                                    {$horaireFerme[$j]['horaire']='fermé'}
+                                    {/for}
+                                    {loop type="chronopost.pickup.point.get.relay" name="chronopost-relay" orderweight="1000" countryid="64" zipcode="77135" city="Pontcarré" address="22 rue Path"}
+                                    {if $ACTIF}
+                                        <address id="address{$IDENTIFIANT}"><label>
+                                        {*    {$ACCESPERSONNEMOBILITEREDUITE} - {$IDENTIFIANT} <br>  - {$COORDGEOLOCALISATIONLATITUDE} - {$COORDGEOLOCALISATIONLONGITUDE} *}
+                                            {if !$firstcoorLa}{$firstcoorLa=$COORDGEOLOCALISATIONLATITUDE}{/if}
+                                            {if !$firstcoorLo}{$firstcoorLo=$COORDGEOLOCALISATIONLONGITUDE}{/if}
+
+                                            <input type="radio" name="chronopostpointrelai" value="{$IDENTIFIANT}"> {if $ACCESPERSONNEMOBILITEREDUITE}<i class="fa fa-wheelchair" aria-hidden="true" title="{intl l="Dispose d'un accès handicapé"}"></i>{*'*} {/if}{$NOM}<br>{$ADRESSE1} {$ADRESSE2} {$ADRESSE3}<br>{$CODEPOSTAL} {$LOCALITE} <br>
+                                            Distance : {if $DISTANCEENMETRE > 1000}{format_number number={$DISTANCEENMETRE/1000}} Kilomètres {else}{$DISTANCEENMETRE} mètres{/if}<br>
+
+                                            {if $LISTEHORAIREOUVERTURE}
+                                                <small>
+                                                {$infoHoraire=$horaireFerme}
+                                                {foreach from=$LISTEHORAIREOUVERTURE item=horaire}
+                                                      {$infoHoraire[$horaire->jour]['jour'] = {intl l="jour{$horaire->jour}" d='chronopostpickuppoint'}}
+                                                      {$infoHoraire[$horaire->jour]['horaire'] = {$horaire->horairesAsString}}
+                                                {/foreach}
+                                                {$tmp={$infoHoraire|ksort}}
+                                                {foreach from=$infoHoraire item=horaire}
+                                                    {intl l={$horaire.jour} d='chronopostpickuppoint'} - {$horaire.horaire}<br>
+                                                {/foreach}
+                                                </small>
+                                            {/if}
+                                        </label>    
+                                        </address>
+                                        <hr>
+                                    {/if}
+                                    {*
+                                        [indiceDeLocalisation] => 
+                                    *}
+                                    {/loop}
+                                        </div>
+                                    </div>
+                                    {*
                                     <div class="clearfix">
                                         <button type="submit" name="chronopost-pickup-point-delivery-mode" value="CHRONO13BAL" class="btn btn-primary pull-right">{intl l="Choose this delivery mode" d="chronopost.pickup.point.fo.default"}</button>
                                     </div>
+                                    *}
                                 </div>
 
                             </div>
@@ -39,8 +128,71 @@
             </div>
         </td>
     </tr>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 
+    {$keygoogle={config key="chronopost_google_map_key"}}
+    {loop type="module-config" name="date-de" module="ChronopostPickupPoint" variable="chronopost_google_map_key"}
+    {if $VALUE}
+        {$keygoogle=$VALUE}
+    {/if}
+    {/loop}
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key={$keygoogle}&callback=initMap&libraries=&v=weekly"
+      defer
+    ></script>
     <script>
+        "use strict";
+
+            let map;
+
+            function initMap() {
+              map = new google.maps.Map(document.getElementById("map"), {
+                center: {
+                  lat: {$firstcoorLa},
+                  lng: {$firstcoorLo}
+                },
+                zoom: 11
+              });
+            {loop type="chronopost.pickup.point.get.relay" name="chronopost-relay" orderweight="1000" countryid="64" zipcode="77135" city="Pontcarré" address="22 rue Path"}
+                {if $ACTIF}
+                    var marker{$IDENTIFIANT} = new google.maps.Marker({
+                        position: new google.maps.LatLng({$COORDGEOLOCALISATIONLATITUDE}, {$COORDGEOLOCALISATIONLONGITUDE}),
+                        map: map,
+                        title: "{$NOM}\n{$ADRESSE1} {$ADRESSE2} {$ADRESSE3}\n{$CODEPOSTAL} {$LOCALITE}",
+                        icon: new google.maps.MarkerImage('{image file="assets/img/chronopostPictoMap.png" source="ChronopostPickupPoint"}')
+                    });    
+
+                    var infoWindowOptions{$IDENTIFIANT} = {
+                        content: '<h2>{$NOM}{if $ACCESPERSONNEMOBILITEREDUITE} <small><i class="fa fa-wheelchair text-info" aria-hidden="true" title="{intl l="Accès handicapé"}"></i></small>{/if}</h2>'
+                        {if $ADRESSE1}+ '{$ADRESSE1}<br>'{/if}
+                        {if $ADRESSE2}+ '{$ADRESSE2}<br>'{/if}
+                        {if $ADRESSE3}+ '{$ADRESSE3}<br>'{/if}
+                        + '{$CODEPOSTAL} {$LOCALITE}<br>'
+                        + 'Distance : {if $DISTANCEENMETRE > 1000}{format_number number={$DISTANCEENMETRE/1000}} Kilomètres {else}{$DISTANCEENMETRE} mètres{/if}<br>'
+                        + '{if $LISTEHORAIREOUVERTURE}{$infoHoraire=$horaireFerme}<small>{foreach from=$LISTEHORAIREOUVERTURE item=horaire}{$infoHoraire[$horaire->jour]['jour'] = {intl l="jour{$horaire->jour}" d='chronopostpickuppoint'}}{$infoHoraire[$horaire->jour]['horaire'] = {$horaire->horairesAsString}}{/foreach}{$tmp={$infoHoraire|ksort}}{foreach from=$infoHoraire item=horaire}{intl l={$horaire.jour} d='chronopostpickuppoint'} - {$horaire.horaire}<br>{/foreach}</small>{/if}'
+                    };
+
+                    var infoWindow{$IDENTIFIANT} = new google.maps.InfoWindow(infoWindowOptions{$IDENTIFIANT});
+                    var infoWindowCurrent = null;
+                    google.maps.event.addListener(marker{$IDENTIFIANT}, 'click', function() {
+                        if(infoWindowCurrent)infoWindowCurrent.close();
+                        infoWindowCurrent=infoWindow{$IDENTIFIANT};
+                        infoWindow{$IDENTIFIANT}.open(map, marker{$IDENTIFIANT});
+                    });
+                    
+                    document.getElementById('address{$IDENTIFIANT}').addEventListener('click', function() {
+                        if(infoWindowCurrent)infoWindowCurrent.close();
+                        infoWindowCurrent=infoWindow{$IDENTIFIANT};
+                        infoWindow{$IDENTIFIANT}.open(map, marker{$IDENTIFIANT});
+                    });
+                    
+                                                          
+                {/if}
+             {/loop}                
+                
+            }
+        
+                 
         function displayContentPickupPoint () {
             $("#deliverytype-chronopost-pickup-point-tr").show(function () {
                 $('.btn-checkout-next').hide();
@@ -48,11 +200,9 @@
         }
 
         $(function(){
-
             if ($("#delivery-method_{$module}").is(':checked')) {
                 displayContentPickupPoint();
             }
-
             $('[name="thelia_order_delivery[delivery-module]"]', '.table-delivery').on('change', function(){
                 if($(this).attr('id') != 'delivery-method_{$module}') {
                     $("#deliverytype-chronopost-pickup-point-tr").hide();
@@ -61,7 +211,113 @@
                     displayContentPickupPoint();
                 }
             });
-
         });
+                 
+        var normalize = (function () {
+            var a = ['À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', 'Ā', 'ā', 'Ă', 'ă', 'Ą', 'ą', 'Ć', 'ć', 'Ĉ', 'ĉ', 'Ċ', 'ċ', 'Č', 'č', 'Ď', 'ď', 'Đ', 'đ', 'Ē', 'ē', 'Ĕ', 'ĕ', 'Ė', 'ė', 'Ę', 'ę', 'Ě', 'ě', 'Ĝ', 'ĝ', 'Ğ', 'ğ', 'Ġ', 'ġ', 'Ģ', 'ģ', 'Ĥ', 'ĥ', 'Ħ', 'ħ', 'Ĩ', 'ĩ', 'Ī', 'ī', 'Ĭ', 'ĭ', 'Į', 'į', 'İ', 'ı', 'Ĳ', 'ĳ', 'Ĵ', 'ĵ', 'Ķ', 'ķ', 'Ĺ', 'ĺ', 'Ļ', 'ļ', 'Ľ', 'ľ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'Ń', 'ń', 'Ņ', 'ņ', 'Ň', 'ň', 'ŉ', 'Ō', 'ō', 'Ŏ', 'ŏ', 'Ő', 'ő', 'Œ', 'œ', 'Ŕ', 'ŕ', 'Ŗ', 'ŗ', 'Ř', 'ř', 'Ś', 'ś', 'Ŝ', 'ŝ', 'Ş', 'ş', 'Š', 'š', 'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ', 'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ', 'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ'];
+            var b = ['A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o'];
+
+            return function (str) {
+                var i = a.length;
+                while (i--) str = str.replace(a[i], b[i]);
+                return str;
+            };
+        }());
+
+        function search_city_chronopost_pickup_point() {
+            var address = document.getElementById("search-address-chronopost-pickup-point").value;
+            var zipcode = document.getElementById("search-zipcode-chronopost-pickup-point").value;
+            var city = document.getElementById("search-city-chronopost-pickup-point").value;
+            var countryid = $("#search-countryid-chronopost-pickup-point").val();
+            if (zipcode == "" || city == "") {
+                alert("{intl l="Please enter a city and a zipcode" d='chronopost.pickup.point.fo.default'}");
+            } else {
+                // Get site base url
+                var url_site = '{url path="/"}module/chronopost-pickup-point/'
+                        + encodeURIComponent(countryid) + '/'
+                        + encodeURIComponent(zipcode) + '/'
+                        + encodeURIComponent(normalize(city));
+                if (address != ""){
+                    url_site += '/' + encodeURIComponent(normalize(address));
+                }
+                // Get search address
+                var adr_geoloc = address + " " + zipcode + " " + city;
+                // Get every relay around customer's address
+                var locations = [];
+                $.getJSON(url_site)
+                        .done(function(data) {
+                            if (!$.isEmptyObject(data)) {
+                                locations = data.locations;
+                                updatemap_chronopost_pickup_point(adr_geoloc, data.lat, data.lng, locations);
+                            } else {
+                                alert("{intl l='chronopost is unavailable. Please choose another delivery method' d='chronopost.pickup.point.fo.default'}");
+                            }
+                        })
+                        .fail(function( jqxhr, textStatus, error ) {
+                            var err = textStatus + ", " + error;
+                        });
+            }
+        }
+                 
+        function updatemap_chronopost_pickup_point(adr_geoloc, lat, lng, locations) {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: {
+                  lat: (lat*1),
+                  lng: (lng*1)
+                },
+                zoom: 11
+              });
+
+            var marker=[];
+            var infoWindowOptions=[];
+            var infoWindow=[];
+            $('#chronopostpickuppointmap').html('');
+            for (var i = 0; i < locations.length; i++) {
+                var locid = locations[i].id;
+                marker[locid] = new google.maps.Marker({
+                    locid: locid,
+                    position: new google.maps.LatLng(locations[i].lat * 1, locations[i].lng * 1),
+                    map: map,
+                    title: locations[i].name + "\n" + locations[i].address + "\n" + locations[i].zipcode + " " + locations[i].city,
+                    icon: new google.maps.MarkerImage('{image file="assets/img/chronopostPictoMap.png" source="ChronopostPickupPoint"}')
+                });    
+                
+                
+                var accesibilite='';
+                if(locations[i].disabledPerson){
+                    accesibilite=' <small><i class="fa fa-wheelchair text-info" aria-hidden="true" title="{intl l="Accès handicapé"}"></i></small>';
+                }
+                infoWindowOptions[locid] = {
+                    locid: locid,
+                    content: '<h2>'+ locations[i].name + accesibilite + '</h2>' + locations[i].address + '<br>' + locations[i].zipcode + ' ' + locations[i].city + '<br>' + 'Distance : '+ locations[i].distance +'<br>'
+                    + locations[i].horaires
+                };
+
+                infoWindow[locid] = new google.maps.InfoWindow(infoWindowOptions[locid]);
+                var infoWindowCurrent = null;
+                google.maps.event.addListener(marker[locid], 'click', function() {
+                    if(infoWindowCurrent)infoWindowCurrent.close();
+                    infoWindowCurrent=infoWindow[this.locid];
+                    infoWindow[this.locid].open(map, marker[this.locid]);
+                });
+                
+                accesibilite='';
+                if(locations[i].disabledPerson){
+                    accesibilite=' <i class="fa fa-wheelchair" aria-hidden="true" title="{intl l="Dispose d\'un accès handicapé"}"></i> ';
+                }
+
+                var adr = '<address data-locid="'+ locid +'" id="address'+ locid +'"><label>' + '<input type="radio" name="chronopostpointrelai" value="'+ locid +'">'+ accesibilite + locations[i].name + '<br>' + locations[i].address + '<br>' + locations[i].zipcode + ' ' + locations[i].city + '<br>' + 'Distance : '+ locations[i].distance +'<br>' + locations[i].horaires + '</label></address><hr>';
+
+                $('#chronopostpickuppointmap').append(adr);
+
+                document.getElementById('address' + locid).addEventListener('click', function() {
+                    if(infoWindowCurrent)infoWindowCurrent.close();
+                    infoWindowCurrent=infoWindow[$(this).data('locid')];
+                    infoWindow[$(this).data('locid')].open(map, marker[$(this).data('locid')]);
+                });
+                
+            }
+        }
     </script>
+
 {/loop}

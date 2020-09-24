@@ -47,7 +47,7 @@ use Thelia\Model\CountryQuery;
  * @method string getCountryid
  * @method string getAddress
  */
-class ChronopostPickupPointGetRelay extends BaseLoop implements ArraySearchLoopInterface
+class ChronopostPickupPointId extends BaseLoop implements ArraySearchLoopInterface
 {
     /**
      * @inheritdoc
@@ -55,11 +55,7 @@ class ChronopostPickupPointGetRelay extends BaseLoop implements ArraySearchLoopI
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createAnyTypeArgument('orderweight', '', true),
-            Argument::createAnyTypeArgument('countryid', ''),
-            Argument::createAnyTypeArgument('zipcode', ''),
-            Argument::createAnyTypeArgument('city', ''),
-            Argument::createAnyTypeArgument('address', '')
+            Argument::createAnyTypeArgument('id')
         );
     }
 
@@ -71,62 +67,31 @@ class ChronopostPickupPointGetRelay extends BaseLoop implements ArraySearchLoopI
     public function buildArray()
     {
         // Find the address ... To find ! \m/
-        $orderWeight = $this->getOrderweight();
-        $zipcode = $this->getZipcode();
-        $city = $this->getCity();
-        $countryId = $this->getCountryid();
-        $address1 = $this->getAddress();
+        $id = $this->getId();
 
-        $addressId = null;
-        //$addressId = $this->getAddress();
+        $search = AddressQuery::create();
 
-        if (!empty($addressId) && (!empty($zipcode) || !empty($city))) {
-            throw new \InvalidArgumentException(
-                "Cannot have argument 'address' and 'zipcode' or 'city' at the same time."
-            );
-        }
-
-        if (null !== $addressModel = AddressQuery::create()->findPk($addressId)) {
-            $address = array(
-                'orderweight' => $orderWeight,
-                'zipcode' => $addressModel->getZipcode(),
-                'city' => $addressModel->getCity(),
-                'address' => $addressModel->getAddress1(),
-                'countrycode' => $addressModel->getCountry()->getIsoalpha2()
-            );
-        } elseif (empty($zipcode) || empty($city)) {
-            $search = AddressQuery::create();
-
-            $customer = $this->securityContext->getCustomerUser();
-            if ($customer !== null) {
-                $search->filterByCustomerId($customer->getId());
-                $search->filterByIsDefault('1');
-            } else {
-                throw new ErrorException('Customer not connected.');
-            }
-
-            $search = $search->findOne();
-            $address['orderweight'] = $orderWeight;
-            $address['zipcode'] = $search->getZipcode();
-            $address['city'] = $search->getCity();
-            $address['address'] = $search->getAddress1();
-            $address['countrycode'] = $search->getCountry()->getIsoalpha2();
+        $customer = $this->securityContext->getCustomerUser();
+        if ($customer !== null) {
+            $search->filterByCustomerId($customer->getId());
+            $search->filterByIsDefault('1');
         } else {
-            $address = array(
-                'orderweight' => $orderWeight,
-                'zipcode' => $zipcode,
-                'city' => $city,
-                'address' => $address1,
-                'countrycode' => CountryQuery::create()
-                    ->findOneById($countryId)
-                    ->getIsoalpha2()
-            );
+            throw new ErrorException('Customer not connected.');
         }
+
+        $search = $search->findOne();
+        $address['orderweight'] = $orderWeight;
+        $address['zipcode'] = $search->getZipcode();
+        $address['city'] = $search->getCity();
+        $address['address'] = $search->getAddress1();
+        $address['countrycode'] = $search->getCountry()->getIsoalpha2();
+
 
         // Then ask the Web Service
         $request = new ChronopostPickupPointRelayController();
         try {
-            $response = $request->findByAddress($address['orderweight'], $address['address'], $address['zipcode'], $address['city'], $address['countrycode']);
+            $response = $request->findByCodeId($id);
+
         } catch (InvalidArgumentException $e) {
             $response = array();
         } catch (\Exception $e) {
@@ -150,9 +115,10 @@ class ChronopostPickupPointGetRelay extends BaseLoop implements ArraySearchLoopI
     {
         foreach ($loopResult->getResultDataCollection() as $item) {
             $loopResultRow = new LoopResultRow();
-        /*    echo '<pre>';
+            echo '<pre>';
             print_r($item);
-            echo '</pre>';  */
+            echo '</pre>';  
+            
             foreach ($item as $key => $value) {
                 $loopResultRow->set(strtoupper($key), $value);
             }
